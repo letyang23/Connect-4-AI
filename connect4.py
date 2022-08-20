@@ -24,7 +24,7 @@ def time_limit(func, args, time_):
 	we have a level playing field ie no agent can cheat and get extra time
 	per moves. If you want to do something similar you should keep an exit
 	flag in your code, but asking every student to keep exit flags in their
-	code in not feasible. This took an embarassingly long time to figure out."""
+	code in not feasible. This took an embarrassingly long time to figure out."""
     t = thread_with_trace(target=func, args=args)
     t.start()
     t.join(time_)
