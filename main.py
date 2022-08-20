@@ -7,9 +7,11 @@ parser = argparse.ArgumentParser(description='Run programming assignment 1')
 parser.add_argument('-w', default=6, type=int, help='Rows of game')
 parser.add_argument('-l', default=7, type=int, help='Columns of game')
 parser.add_argument('-p1', default='human', type=str,
-                    help='Player 1 agent. Use any of the following: [human, humanTxt, stupidAI, randomAI, monteCarloAI, minimaxAI, alphaBetaAI]')
+                    help='Player 1 agent. Use any of the following: [human, humanTxt, stupidAI, randomAI, '
+                         'monteCarloAI, minimaxAI, alphaBetaAI]')
 parser.add_argument('-p2', default='human', type=str,
-                    help='Player 2 agent. Use any of the following: [human, humanTxt, stupidAI, randomAI, monteCarloAI, minimaxAI, alphaBetaAI]')
+                    help='Player 2 agent. Use any of the following: [human, humanTxt, stupidAI, randomAI, '
+                         'monteCarloAI, minimaxAI, alphaBetaAI]')
 parser.add_argument('-seed', default=0, type=int, help='Seed for random algorithms')
 parser.add_argument('-visualize', default='True', type=str, help='Use GUI')
 parser.add_argument('-verbose', default='True', type=str, help='Print boards to shell')
