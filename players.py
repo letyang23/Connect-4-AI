@@ -112,7 +112,10 @@ class minimaxAI(connect4Player):
             return eval(env)
         min_value = math.inf
         possible = env.topPosition >= 0
-        for move in possible:
+        indices = []
+        for i, p in enumerate(possible):
+            if p:
+                indices.append(i)
             # min_value = min(value, self.MAX(simulateMove(deepcopy(env), column), depth - 1))
             # child = self.simulateMove(deepcopy(env), move, self.opponent.position)
             child = self.simulateMove(deepcopy(env), move, self.position)
@@ -225,7 +228,7 @@ class minimaxAI(connect4Player):
             #     move_to_return = column
             #     value = new_value
             child = self.simulateMove(deepcopy(env), column, self.opponent.position)
-            v = self.MIN(child, max_depth-1)
+            v = self.MIN(child, max_depth - 1)
             if v > max_v:
                 max_v = v
                 move[:] = [column]
