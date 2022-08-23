@@ -93,10 +93,10 @@ class minimaxAI(connect4Player):
         env.board[env.topPosition[move]][move] = player
         env.topPosition[move] -= 1
         env.history[0].append(move)
-        return move
+        return env.board[env.topPosition[move]][move]
 
     def MAX(self, env, depth):
-        if env.gameOver(env) or depth == 0:
+        if env.gameOver(env.history[0][-1], self.position) or depth == 0:
             return eval(env)
         max_value = -math.inf
         possible = env.topPosition >= 0
@@ -108,7 +108,7 @@ class minimaxAI(connect4Player):
         return max_value
 
     def MIN(self, env, depth):
-        if env.gameOver(env) or depth == 0:
+        if env.gameOver(env.history[0][-1], self.position) or depth == 0:
             return eval(env)
         min_value = math.inf
         possible = env.topPosition >= 0
@@ -228,7 +228,7 @@ class minimaxAI(connect4Player):
             v = self.MIN(child, max_depth-1)
             if v > max_v:
                 max_v = v
-                column[:] = [column]
+                move[:] = [column]
 
             # return move_to_return
             # child = self.MIN(simulateMove(deepcopy(env), column), max_depth - 1)
