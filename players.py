@@ -93,18 +93,22 @@ class minimaxAI(connect4Player):
         env.board[env.topPosition[move]][move] = player
         env.topPosition[move] -= 1
         env.history[0].append(move)
-        return env.board[env.topPosition[move]][move]
+        return env
 
     def MAX(self, env, depth):
         if env.gameOver(env.history[0][-1], self.position) or depth == 0:
             return eval(env)
         max_value = -math.inf
         possible = env.topPosition >= 0
-        for move in possible:
+        indices = []
+        for i, p in enumerate(possible):
+            if p:
+                indices.append(i)
             # max_value = max(value, self.MIN(simulateMove(deepcopy(env), column), depth - 1))
             # child = self.simulateMove(deepcopy(env), move, self.opponent.position)
-            child = self.simulateMove(deepcopy(env), move, self.opponent.position)
-            max_value = max(max_value, self.MIN(child, depth - 1))
+            for move in indices:
+                child = self.simulateMove(deepcopy(env), move, self.opponent.position)
+                max_value = max(max_value, self.MIN(child, depth - 1))
         return max_value
 
     def MIN(self, env, depth):
@@ -118,6 +122,7 @@ class minimaxAI(connect4Player):
                 indices.append(i)
             # min_value = min(value, self.MAX(simulateMove(deepcopy(env), column), depth - 1))
             # child = self.simulateMove(deepcopy(env), move, self.opponent.position)
+        for move in indices:
             child = self.simulateMove(deepcopy(env), move, self.position)
             min_value = min(min_value, self.MAX(child, depth - 1))
         return min_value
@@ -222,7 +227,11 @@ class minimaxAI(connect4Player):
         # value = -10000
         possible = env.topPosition >= 0
         max_v = -math.inf
-        for column in possible:
+        indices = []
+        for i, p in enumerate(possible):
+            if p:
+                indices.append(i)
+        for column in indices:
             # child = self.MIN(simulateMove(deepcopy(env), column), max_depth - 1)
             # if new_value > value:
             #     move_to_return = column
