@@ -93,10 +93,10 @@ class minimaxAI(connect4Player):
         env.board[env.topPosition[move]][move] = player
         env.topPosition[move] -= 1
         env.history[0].append(move)
-        return env.history[0]
+        return move
 
     def MAX(self, env, depth):
-        if env.gameOver(env) or depth == 0:
+        if env.gameOver() or depth == 0:
             return eval(env)
         max_value = -math.inf
         possible = env.topPosition >= 0
@@ -118,7 +118,6 @@ class minimaxAI(connect4Player):
             child = self.simulateMove(deepcopy(env), move, self.position)
             min_value = min(min_value, self.MAX(child, depth - 1))
         return min_value
-
 
     def eval(env, depth):
         heur = 0
@@ -206,6 +205,16 @@ class minimaxAI(connect4Player):
                     pass
         return heur
 
+    # def minimax(self, env, move, max_depth):
+    #     # value = -10000
+    #     possible = env.topPosition >= 0
+    #     value = -math.inf
+    #     for column in possible:
+    #         new_value = self.MIN(self.simulateMove(deepcopy(env), move, column), max_depth-1)
+    #         if new_value > value:
+    #             move_to_return = column
+    #             value = new_value
+
     def minimax(self, env, move, max_depth):
         # value = -10000
         possible = env.topPosition >= 0
@@ -216,17 +225,28 @@ class minimaxAI(connect4Player):
             #     move_to_return = column
             #     value = new_value
             child = self.simulateMove(deepcopy(env), column, self.opponent.position)
-            v = self.MIN(child, max_depth-1)  #### MAYBE depth - 1? ####
+            v = self.MIN(child, max_depth-1)
             if v > max_v:
                 max_v = v
                 column[:] = [column]
-        return column
 
-    def iterativeDeepening(self, env, move):
-        limit = 1
-        while True:
-            move[:] = [self.minimax(deepcopy(env), move, limit)]
-            limit += 1
+            # return move_to_return
+            # child = self.MIN(simulateMove(deepcopy(env), column), max_depth - 1)
+            # if new_value > value:
+            #     move_to_return = column
+            #     value = new_value
+            # child = self.simulateMove(deepcopy(env), move, self.opponent.position)
+            # v = self.MIN(child, max_depth-1)  #### MAYBE depth - 1? ####
+            # if v > max_v:
+            #     max_v = v
+            #     move[:] = [move]
+        # return column
+
+    # def iterativeDeepening(self, env, move):
+    #     limit = 1
+    #     while True:
+    #         move[:] = [self.minimax(deepcopy(env), move, limit)]
+    #         limit += 1
 
 
 class alphaBetaAI(connect4Player):

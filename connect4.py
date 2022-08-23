@@ -5,31 +5,31 @@ import pygame
 import random
 import time
 from threading import Thread
-from thread import KillableThread, thread_with_exception, thread_with_trace
+# from thread import KillableThread, thread_with_exception, thread_with_trace
 import multiprocessing
 import signal
 from copy import deepcopy
 
 import threading
 
-def time_limit(func, args, time_):
-
-	'''Python tries very, very hard to make sure you can't kill threads,
-	but with enough effort, anything is possible. Here, we uses traces
-	to inject a system exit exception on the next line of whatever the
-	thread is executing. I am fairly certain this can kill anything.
-
-	You probably should not use this function because killing threads
-	is bad practice. I am only doing it here because we need to make sure
-	we have a level playing field ie no agent can cheat and get extra time
-	per moves. If you want to do something similar you should keep an exit
-	flag in your code, but asking every student to keep exit flags in their
-	code in not feasible. This took an embarassingly long time to figure out.'''
-	t = thread_with_trace(target=func, args=args)
-	t.start()
-	t.join(time_)
-	if t.is_alive():
-		t.kill()
+# def time_limit(func, args, time_):
+#
+# 	'''Python tries very, very hard to make sure you can't kill threads,
+# 	but with enough effort, anything is possible. Here, we uses traces
+# 	to inject a system exit exception on the next line of whatever the
+# 	thread is executing. I am fairly certain this can kill anything.
+#
+# 	You probably should not use this function because killing threads
+# 	is bad practice. I am only doing it here because we need to make sure
+# 	we have a level playing field ie no agent can cheat and get extra time
+# 	per moves. If you want to do something similar you should keep an exit
+# 	flag in your code, but asking every student to keep exit flags in their
+# 	code in not feasible. This took an embarassingly long time to figure out.'''
+# 	t = thread_with_trace(target=func, args=args)
+# 	t.start()
+# 	t.join(time_)
+# 	if t.is_alive():
+# 		t.kill()
 
 class connect4():
 	def __init__(self, player1, player2, board_shape=(6,7), visualize=False, game=0, save=False,
@@ -68,7 +68,8 @@ class connect4():
 	def playTurn(self):
 		move = self.randMove()
 		if self.turnPlayer.position in self.limit:
-			time_limit(self.turnPlayer.play, (self,move,), self.time_limits[self.turnPlayer.position-1])
+			print("0.5")
+			# time_limit(self.turnPlayer.play, (self,move,), self.time_limits[self.turnPlayer.position-1])
 		else:
 			self.turnPlayer.play(self, move)
 		# Move returned as list because lists are mutable
