@@ -96,7 +96,7 @@ class minimaxAI(connect4Player):
         return move
 
     def MAX(self, env, depth):
-        if env.gameOver() or depth == 0:
+        if env.gameOver(env) or depth == 0:
             return eval(env)
         max_value = -math.inf
         possible = env.topPosition >= 0
