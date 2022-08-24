@@ -98,6 +98,8 @@ class minimaxAI(connect4Player):
     def MAX(self, env, depth):
         # if env.gameOver(env.history[0][-1], self.position) or depth == 0:
         #     return self.eval(env)
+        if len(env.history[0]) + len(env.history[1]) == env.board.shape[0] * env.board.shape[1]:
+            return 0
         if env.gameOver(env.history[0][-1], self.opponent.position):
             return -100000
         if depth == 0:
@@ -111,13 +113,15 @@ class minimaxAI(connect4Player):
             # max_value = max(value, self.MIN(simulateMove(deepcopy(env), column), depth - 1))
             # child = self.simulateMove(deepcopy(env), move, self.opponent.position)
         for move in indices:
-            child = self.simulateMove(deepcopy(env), move, self.opponent.position)
+            child = self.simulateMove(deepcopy(env), move, self.position)
             max_value = max(max_value, self.MIN(child, depth - 1))
         return max_value
 
     def MIN(self, env, depth):
         # if env.gameOver(env.history[0][-1], self.position) or depth == 0:
         #     return self.eval(env)
+        if len(env.history[0]) + len(env.history[1]) == env.board.shape[0] * env.board.shape[1]:
+            return 0
         if env.gameOver(env.history[0][-1], self.position):
             return 100000
         if depth == 0:
@@ -132,7 +136,7 @@ class minimaxAI(connect4Player):
             # min_value = min(value, self.MAX(simulateMove(deepcopy(env), column), depth - 1))
             # child = self.simulateMove(deepcopy(env), move, self.opponent.position)
         for move in indices:
-            child = self.simulateMove(deepcopy(env), move, self.position)
+            child = self.simulateMove(deepcopy(env), move, self.opponent.position)
             min_value = min(min_value, self.MAX(child, depth - 1))
         return min_value
 
@@ -247,7 +251,7 @@ class minimaxAI(connect4Player):
             # if new_value > value:
             #     move_to_return = column
             #     value = new_value
-            child = self.simulateMove(deepcopy(env), column, self.opponent.position)
+            child = self.simulateMove(deepcopy(env), column, self.position)
             v = self.MIN(child, max_depth - 1)
             if v > max_v:
                 max_v = v
