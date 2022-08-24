@@ -100,8 +100,6 @@ class minimaxAI(connect4Player):
         return env
 
     def MAX(self, env, depth):
-        # if env.gameOver(env.history[0][-1], self.position) or depth == 0:
-        #     return self.eval(env)
         if len(env.history[0]) + len(env.history[1]) == env.board.shape[0] * env.board.shape[1]:
             return 0
         if env.gameOver(env.history[0][-1], self.opponent.position):
@@ -117,22 +115,17 @@ class minimaxAI(connect4Player):
         for i, p in enumerate(possible):
             if p:
                 indices.append(i)
-            # max_value = max(value, self.MIN(simulateMove(deepcopy(env), column), depth - 1))
-            # child = self.simulateMove(deepcopy(env), move, self.opponent.position)
         for move in indices:
             child = self.simulateMove(deepcopy(env), move, self.position)
             max_value = max(max_value, self.MIN(child, depth - 1))
         return max_value
 
     def MIN(self, env, depth):
-        # if env.gameOver(env.history[0][-1], self.position) or depth == 0:
-        #     return self.eval(env)
         if len(env.history[0]) + len(env.history[1]) == env.board.shape[0] * env.board.shape[1]:
             return 0
         if env.gameOver(env.history[0][-1], self.position):
             return 100000
         if depth == 0:
-            # return eval(env.board)
             if self.position == 1:
                 return self.eval_p1(env)
             else:
@@ -143,20 +136,10 @@ class minimaxAI(connect4Player):
         for i, p in enumerate(possible):
             if p:
                 indices.append(i)
-            # min_value = min(value, self.MAX(simulateMove(deepcopy(env), column), depth - 1))
-            # child = self.simulateMove(deepcopy(env), move, self.opponent.position)
         for move in indices:
             child = self.simulateMove(deepcopy(env), move, self.opponent.position)
             min_value = min(min_value, self.MAX(child, depth - 1))
         return min_value
-
-    # def eval(self, board):
-    #     value = 0
-    #     for r in range(ROW_COUNT):
-    #         row_array = [int(i) for i in list(board[r,:])]
-    #         for c in range(COLUMN_COUNT-3):
-    #             window = row_array[c:c+4]
-    #     return value
 
     def eval(self, env):
         # ROW_COUNT = 6  # height
@@ -177,12 +160,12 @@ class minimaxAI(connect4Player):
 
                     # subtract player two streak score to heur
                     if state.board[i][j] == state.board[i + 1][j] == 1:
-                        heur -= 100
+                        heur -= 10
                     if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 1:
-                        heur -= 1000
+                        heur -= 100
                     if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][
                         j] == 1:
-                        heur -= 100000
+                        heur -= 10000
                 except IndexError:
                     pass
 
@@ -198,12 +181,12 @@ class minimaxAI(connect4Player):
 
                     # subtract player two streaks from heur
                     if state.board[i][j] == state.board[i][j + 1] == 1:
-                        heur -= 100
+                        heur -= 10
                     if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 1:
-                        heur -= 1000
+                        heur -= 100
                     if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][
                         j + 3] == 1:
-                        heur -= 100000
+                        heur -= 10000
                 except IndexError:
                     pass
 
@@ -221,14 +204,289 @@ class minimaxAI(connect4Player):
 
                     # add player two streaks to heur
                     if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == 1:
-                        heur -= 1000
+                        heur -= 100
                     if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
                         j + 2] == 1:
-                        heur -= 1000
+                        heur -= 100
                     if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
                         j + 2] \
                             == state.board[i + 3][j + 3] == 1:
+                        heur -= 10000
+                except IndexError:
+                    pass
+
+                try:
+                    # add  player one streaks
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == 2:
+                        heur += 10
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][
+                        j - 2] == 2:
+                        heur += 100
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][j - 2] \
+                            == state.board[i + 3][j - 3] == 2:
+                        heur += 10000
+
+                    # subtract player two streaks
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == 1:
+                        heur -= 100
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][
+                        j - 2] == 1:
+                        heur -= 1000
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][j - 2] \
+                            == state.board[i + 3][j - 3] == 1:
                         heur -= 100000
+                except IndexError:
+                    pass
+        return heur
+
+    def eval_p1(self, env):
+        # ROW_COUNT = 6  # height
+        # COLUMN_COUNT = 7  # width
+        heur = 0
+        state = deepcopy(env)
+        for i in range(0, COLUMN_COUNT):
+            for j in range(0, ROW_COUNT):
+                try:
+                    # add player one streak scores to heur
+                    if state.board[i][j] == state.board[i + 1][j] == 2:
+                        heur += 10
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 2:
+                        heur += 100
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][
+                        j] == 2:
+                        heur += 10000
+
+                    # subtract player two streak score to heur
+                    if state.board[i][j] == state.board[i + 1][j] == 1:
+                        heur -= 10
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 1:
+                        heur -= 100
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][
+                        j] == 1:
+                        heur -= 10000
+                except IndexError:
+                    pass
+
+                try:
+                    # add player one vertical streaks to heur
+                    if state.board[i][j] == state.board[i][j + 1] == 2:
+                        heur += 10
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 2:
+                        heur += 100
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][
+                        j + 3] == 2:
+                        heur += 10000
+
+                    # subtract player two streaks from heur
+                    if state.board[i][j] == state.board[i][j + 1] == 1:
+                        heur -= 10
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 1:
+                        heur -= 100
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][
+                        j + 3] == 1:
+                        heur -= 10000
+                except IndexError:
+                    pass
+
+                try:
+                    # add player one streaks to heur
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == 2:
+                        heur += 100
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] == 2:
+                        heur += 100
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] \
+                            == state.board[i + 3][j + 3] == 2:
+                        heur += 10000
+
+                    # add player two streaks to heur
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == 1:
+                        heur -= 100
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] == 1:
+                        heur -= 100
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] \
+                            == state.board[i + 3][j + 3] == 1:
+                        heur -= 10000
+                except IndexError:
+                    pass
+
+                try:
+                    # add  player one streaks
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == 2:
+                        heur += 10
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][
+                        j - 2] == 2:
+                        heur += 100
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][j - 2] \
+                            == state.board[i + 3][j - 3] == 2:
+                        heur += 10000
+
+                    # subtract player two streaks
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == 1:
+                        heur -= 100
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][
+                        j - 2] == 1:
+                        heur -= 1000
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][j - 2] \
+                            == state.board[i + 3][j - 3] == 1:
+                        heur -= 100000
+                except IndexError:
+                    pass
+        return heur
+
+    def minimax(self, env, move, max_depth):
+        possible = env.topPosition >= 0
+        max_v = -math.inf
+        indices = []
+        for i, p in enumerate(possible):
+            if p:
+                indices.append(i)
+        for column in indices:
+            child = self.simulateMove(deepcopy(env), column, self.position)
+            v = self.MIN(child, max_depth - 1)
+            if v > max_v:
+                max_v = v
+                move[:] = [column]
+
+
+class alphaBetaAI(connect4Player):
+
+    def play(self, env, move):
+        if len(env.history[0]) == 0 or len(env.history[1]) == 0:
+            move[:] = [3]
+            print("first move finished")
+            return
+        self.minimax(deepcopy(env), move, 4)
+        print("Finished!")
+
+    def simulateMove(self, env, move, player):
+        env.board[env.topPosition[move]][move] = player
+        env.topPosition[move] -= 1
+        env.history[0].append(move)
+        return env
+
+    def MAX(self, env, depth, alpha, beta):
+        if len(env.history[0]) + len(env.history[1]) == env.board.shape[0] * env.board.shape[1]:
+            return 0
+        if env.gameOver(env.history[0][-1], self.opponent.position):
+            return -math.inf
+        if depth == 0:
+            if self.position == 1:
+                return self.eval_p1(env)
+            else:
+                return self.eval(env)
+        max_value = -math.inf
+        possible = env.topPosition >= 0
+        indices = []
+        for i, p in enumerate(possible):
+            if p:
+                indices.append(i)
+        for move in indices:
+            child = self.simulateMove(deepcopy(env), move, self.position)
+            max_value = max(max_value, self.MIN(child, depth - 1, alpha, beta))
+            alpha = max(alpha, max_value)
+            if max_value >= beta:
+                break
+        return max_value
+
+    def MIN(self, env, depth, alpha, beta):
+        if len(env.history[0]) + len(env.history[1]) == env.board.shape[0] * env.board.shape[1]:
+            return 0
+        if env.gameOver(env.history[0][-1], self.position):
+            return math.inf
+        if depth == 0:
+            if self.position == 1:
+                return self.eval_p1(env)
+            else:
+                return self.eval(env)
+        min_value = math.inf
+        possible = env.topPosition >= 0
+        indices = []
+        for i, p in enumerate(possible):
+            if p:
+                indices.append(i)
+        for move in indices:
+            child = self.simulateMove(deepcopy(env), move, self.opponent.position)
+            min_value = min(min_value, self.MAX(child, depth - 1, alpha, beta))
+            beta = min(beta, min_value)
+            if min_value <= alpha:
+                break
+        return min_value
+
+    def eval(self, env):
+        # ROW_COUNT = 6  # height
+        # COLUMN_COUNT = 7  # width
+        heur = 0
+        state = deepcopy(env)
+        for i in range(0, COLUMN_COUNT):
+            for j in range(0, ROW_COUNT):
+                try:
+                    # add player one streak scores to heur
+                    if state.board[i][j] == state.board[i + 1][j] == 2:
+                        heur += 10
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 2:
+                        heur += 100
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][
+                        j] == 2:
+                        heur += 10000
+
+                    # subtract player two streak score to heur
+                    if state.board[i][j] == state.board[i + 1][j] == 1:
+                        heur -= 10
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 1:
+                        heur -= 100
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][
+                        j] == 1:
+                        heur -= 10000
+                except IndexError:
+                    pass
+
+                try:
+                    # add player one vertical streaks to heur
+                    if state.board[i][j] == state.board[i][j + 1] == 2:
+                        heur += 10
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 2:
+                        heur += 100
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][
+                        j + 3] == 2:
+                        heur += 10000
+
+                    # subtract player two streaks from heur
+                    if state.board[i][j] == state.board[i][j + 1] == 1:
+                        heur -= 10
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 1:
+                        heur -= 100
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][
+                        j + 3] == 1:
+                        heur -= 10000
+                except IndexError:
+                    pass
+
+                try:
+                    # add player one streaks to heur
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == 2:
+                        heur += 100
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] == 2:
+                        heur += 100
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] \
+                            == state.board[i + 3][j + 3] == 2:
+                        heur += 10000
+
+                    # add player two streaks to heur
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == 1:
+                        heur -= 100
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] == 1:
+                        heur -= 100
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] \
+                            == state.board[i + 3][j + 3] == 1:
+                        heur -= 10000
                 except IndexError:
                     pass
 
@@ -354,58 +612,22 @@ class minimaxAI(connect4Player):
                     pass
         return heur
 
-    # def minimax(self, env, move, max_depth):
-    #     # value = -10000
-    #     possible = env.topPosition >= 0
-    #     value = -math.inf
-    #     for column in possible:
-    #         new_value = self.MIN(self.simulateMove(deepcopy(env), move, column), max_depth-1)
-    #         if new_value > value:
-    #             move_to_return = column
-    #             value = new_value
-
     def minimax(self, env, move, max_depth):
-        # value = -10000
         possible = env.topPosition >= 0
         max_v = -math.inf
+        alpha = -math.inf
+        beta = math.inf
         indices = []
         for i, p in enumerate(possible):
             if p:
                 indices.append(i)
         for column in indices:
-            # child = self.MIN(simulateMove(deepcopy(env), column), max_depth - 1)
-            # if new_value > value:
-            #     move_to_return = column
-            #     value = new_value
             child = self.simulateMove(deepcopy(env), column, self.position)
-            v = self.MIN(child, max_depth - 1)
+            v = self.MIN(child, max_depth - 1, alpha, beta)
+            alpha = max(alpha, v)
             if v > max_v:
                 max_v = v
                 move[:] = [column]
-
-            # return move_to_return
-            # child = self.MIN(simulateMove(deepcopy(env), column), max_depth - 1)
-            # if new_value > value:
-            #     move_to_return = column
-            #     value = new_value
-            # child = self.simulateMove(deepcopy(env), move, self.opponent.position)
-            # v = self.MIN(child, max_depth-1)  #### MAYBE depth - 1? ####
-            # if v > max_v:
-            #     max_v = v
-            #     move[:] = [move]
-        # return column
-
-    # def iterativeDeepening(self, env, move):
-    #     limit = 1
-    #     while True:
-    #         move[:] = [self.minimax(deepcopy(env), move, limit)]
-    #         limit += 1
-
-
-class alphaBetaAI(connect4Player):
-
-    def play(self, env, move):
-        pass
 
 
 SQUARESIZE = 100
