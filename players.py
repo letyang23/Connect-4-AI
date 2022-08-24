@@ -86,7 +86,11 @@ class stupidAI(connect4Player):
 class minimaxAI(connect4Player):
 
     def play(self, env, move):
-        self.minimax(deepcopy(env), move, 3)
+        if len(env.history[0]) == 0 and len(env.history[1]) == 0:
+            move[:] = [3]
+            print("first move finished")
+            return
+        self.minimax(deepcopy(env), move, 4)
         print("Finished!")
 
     def simulateMove(self, env, move, player):
@@ -103,7 +107,10 @@ class minimaxAI(connect4Player):
         if env.gameOver(env.history[0][-1], self.opponent.position):
             return -100000
         if depth == 0:
-            return self.eval(env)
+            if self.position == 1:
+                return self.eval_p1(env)
+            else:
+                return self.eval(env)
         max_value = -math.inf
         possible = env.topPosition >= 0
         indices = []
@@ -126,7 +133,10 @@ class minimaxAI(connect4Player):
             return 100000
         if depth == 0:
             # return eval(env.board)
-            return self.eval(env)
+            if self.position == 1:
+                return self.eval_p1(env)
+            else:
+                return self.eval(env)
         min_value = math.inf
         possible = env.topPosition >= 0
         indices = []
@@ -140,6 +150,14 @@ class minimaxAI(connect4Player):
             min_value = min(min_value, self.MAX(child, depth - 1))
         return min_value
 
+    # def eval(self, board):
+    #     value = 0
+    #     for r in range(ROW_COUNT):
+    #         row_array = [int(i) for i in list(board[r,:])]
+    #         for c in range(COLUMN_COUNT-3):
+    #             window = row_array[c:c+4]
+    #     return value
+
     def eval(self, env):
         # ROW_COUNT = 6  # height
         # COLUMN_COUNT = 7  # width
@@ -149,81 +167,189 @@ class minimaxAI(connect4Player):
             for j in range(0, ROW_COUNT):
                 try:
                     # add player one streak scores to heur
-                    if state.board[i][j] == state.board[i + 1][j] == 0:
+                    if state.board[i][j] == state.board[i + 1][j] == 2:
                         heur += 10
-                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 0:
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 2:
                         heur += 100
-                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][j] == 0:
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][
+                        j] == 2:
                         heur += 10000
 
                     # subtract player two streak score to heur
                     if state.board[i][j] == state.board[i + 1][j] == 1:
-                        heur -= 10
-                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 1:
                         heur -= 100
-                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][j] == 1:
-                        heur -= 10000
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 1:
+                        heur -= 1000
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][
+                        j] == 1:
+                        heur -= 100000
                 except IndexError:
                     pass
 
                 try:
                     # add player one vertical streaks to heur
-                    if state.board[i][j] == state.board[i][j + 1] == 0:
+                    if state.board[i][j] == state.board[i][j + 1] == 2:
                         heur += 10
-                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 0:
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 2:
                         heur += 100
-                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][j + 3] == 0:
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][
+                        j + 3] == 2:
                         heur += 10000
 
                     # subtract player two streaks from heur
                     if state.board[i][j] == state.board[i][j + 1] == 1:
-                        heur -= 10
-                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 1:
                         heur -= 100
-                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][j + 3] == 1:
-                        heur -= 10000
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 1:
+                        heur -= 1000
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][
+                        j + 3] == 1:
+                        heur -= 100000
                 except IndexError:
                     pass
 
                 try:
                     # add player one streaks to heur
-                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == 0:
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == 2:
                         heur += 100
-                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][j + 2] == 0:
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] == 2:
                         heur += 100
-                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][j + 2] \
-                            == state.board[i + 3][j + 3] == 0:
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] \
+                            == state.board[i + 3][j + 3] == 2:
                         heur += 10000
 
                     # add player two streaks to heur
                     if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == 1:
-                        heur -= 100
-                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][j + 2] == 1:
-                        heur -= 100
-                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][j + 2] \
+                        heur -= 1000
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] == 1:
+                        heur -= 1000
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] \
                             == state.board[i + 3][j + 3] == 1:
-                        heur -= 10000
+                        heur -= 100000
                 except IndexError:
                     pass
 
                 try:
                     # add  player one streaks
-                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == 0:
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == 2:
                         heur += 10
-                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][j - 2] == 0:
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][
+                        j - 2] == 2:
                         heur += 100
                     if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][j - 2] \
-                            == state.board[i + 3][j - 3] == 0:
+                            == state.board[i + 3][j - 3] == 2:
                         heur += 10000
 
                     # subtract player two streaks
                     if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == 1:
-                        heur -= 10
-                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][j - 2] == 1:
                         heur -= 100
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][
+                        j - 2] == 1:
+                        heur -= 1000
                     if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][j - 2] \
                             == state.board[i + 3][j - 3] == 1:
-                        heur -= 10000
+                        heur -= 100000
+                except IndexError:
+                    pass
+        return heur
+
+    def eval_p1(self, env):
+        # ROW_COUNT = 6  # height
+        # COLUMN_COUNT = 7  # width
+        heur = 0
+        state = deepcopy(env)
+        for i in range(0, COLUMN_COUNT):
+            for j in range(0, ROW_COUNT):
+                try:
+                    # add player one streak scores to heur
+                    if state.board[i][j] == state.board[i + 1][j] == 1:
+                        heur += 10
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 1:
+                        heur += 100
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][
+                        j] == 1:
+                        heur += 10000
+
+                    # subtract player two streak score to heur
+                    if state.board[i][j] == state.board[i + 1][j] == 2:
+                        heur -= 100
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == 2:
+                        heur -= 1000
+                    if state.board[i][j] == state.board[i + 1][j] == state.board[i + 2][j] == state.board[i + 3][
+                        j] == 2:
+                        heur -= 100000
+                except IndexError:
+                    pass
+
+                try:
+                    # add player one vertical streaks to heur
+                    if state.board[i][j] == state.board[i][j + 1] == 1:
+                        heur += 10
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 1:
+                        heur += 100
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][
+                        j + 3] == 1:
+                        heur += 10000
+
+                    # subtract player two streaks from heur
+                    if state.board[i][j] == state.board[i][j + 1] == 2:
+                        heur -= 100
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == 2:
+                        heur -= 1000
+                    if state.board[i][j] == state.board[i][j + 1] == state.board[i][j + 2] == state.board[i][
+                        j + 3] == 2:
+                        heur -= 100000
+                except IndexError:
+                    pass
+
+                try:
+                    # add player one streaks to heur
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == 1:
+                        heur += 100
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] == 1:
+                        heur += 100
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] \
+                            == state.board[i + 3][j + 3] == 1:
+                        heur += 10000
+
+                    # add player two streaks to heur
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == 2:
+                        heur -= 1000
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] == 2:
+                        heur -= 1000
+                    if not j + 3 > ROW_COUNT and state.board[i][j] == state.board[i + 1][j + 1] == state.board[i + 2][
+                        j + 2] \
+                            == state.board[i + 3][j + 3] == 2:
+                        heur -= 100000
+                except IndexError:
+                    pass
+
+                try:
+                    # add  player one streaks
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == 1:
+                        heur += 10
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][
+                        j - 2] == 1:
+                        heur += 100
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][j - 2] \
+                            == state.board[i + 3][j - 3] == 1:
+                        heur += 10000
+
+                    # subtract player two streaks
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == 2:
+                        heur -= 100
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][
+                        j - 2] == 2:
+                        heur -= 1000
+                    if not j - 3 < 0 and state.board[i][j] == state.board[i + 1][j - 1] == state.board[i + 2][j - 2] \
+                            == state.board[i + 3][j - 3] == 2:
+                        heur -= 100000
                 except IndexError:
                     pass
         return heur
